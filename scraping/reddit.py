@@ -4,7 +4,7 @@ import pandas as pd
 from datetime import datetime
 http = urllib3.PoolManager()
 
-def reddit(start_time, end_time, num_entries):
+def scrape_reddit(start_time, end_time, num_entries):
     """
     Scrape for Reddit posts with PushShift API
 

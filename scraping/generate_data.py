@@ -4,17 +4,19 @@ import json
 import sys
 import os
 import time
+
+from .reddit import scrape_reddit
+from .article_scraper import scrape_article
+from .sentiment_analysis import sentiment_analysis
+
 sys.path.insert(0, '../../data_301_project/')
-from scraping.reddit import reddit
-from scraping.article_scraper import scrape_article
-from scraping.sentiment_analysis import sentiment_analysis
 
 def generate_reddit_json(time, total_days, days_apart, num_entries):
     # generating data in increments of 100 days
     lst = []
     print('gathering data...')
     for i in range(0, total_days, days_apart):
-        lst += reddit(i, i+days_apart, num_entries) 
+        lst += scrape_reddit(i, i+days_apart, num_entries)
     print("length of reddit list: ", len(lst))
     id_num = 1
     for i in lst:
