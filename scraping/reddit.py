@@ -1,10 +1,12 @@
 import json
 import urllib3
 import pandas as pd
+import praw
 from datetime import datetime
+from keys.api_keys import *
 http = urllib3.PoolManager()
 
-def scrape_reddit(start_time, end_time, num_entries):
+def scrape_reddit():
     """
     Scrape for Reddit posts with PushShift API
 
@@ -17,23 +19,11 @@ def scrape_reddit(start_time, end_time, num_entries):
     Output:
     list of reddit posts
     """
-    user_agent = ""
-    # specify the url name and parameters
-    pushshift_url = (
-        'https://api.pushshift.io/reddit/search/submission/?subreddit=news&sort_type=score&'
-        'sort=desc&before={start}d&after={end}d&size={num_entries}&filter=score,title,author,created_utc,url'
-        ).format(start=start_time, end=end_time, num_entries=num_entries)
+    reddit = praw.Reddit(client_id=reddit_id,
+            client_secret=reddit_secret,
+            user_agent=reddit_user_agent)
+    for submission in reddit.subreddit('btc').hot(limit=10):
+        print(submission.title)
 
-    # query pushshift API and retrieve the JSON reddit posts in r/news
-    response = http.request('GET', pushshift_url)
-    reddit_posts = json.loads(response.data.decode('utf-8'))['data']
-
-    # extract just the title from each post in the list of reddit posts
-
-    #print(datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S'))
-
-    # test call of the bbc function
-    # at the moment this seems to be either returning None or
-    # resulting in a runtime error
-    # bbc.bbc(headlines[5])
-    return reddit_posts
+if __name__ == '__main__':
+    scrape_reddit()
