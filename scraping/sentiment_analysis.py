@@ -16,12 +16,7 @@ def clean_string(tweet):
 
 def sentiment_analysis_helper(text):
     analysis = TextBlob(clean_string(text))
-    if analysis.sentiment.polarity > 0:
-        return 1
-    elif analysis.sentiment.polarity == 0:
-        return 0
-    else:
-        return -1 
+    return analysis.sentiment.polarity
 
 def tokenize_title(test_title):
     stop_words = set(stopwords.words('english'))

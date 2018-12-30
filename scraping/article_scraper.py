@@ -10,6 +10,8 @@ import sys
 sys.path.insert(0, '../../data_301_project/')
 from nlp.bbc_categorization import bbc_categorization
 
+
+
 def scrape_article(id_num, headline, url):
     """
     Scrapes the article for text and headline
