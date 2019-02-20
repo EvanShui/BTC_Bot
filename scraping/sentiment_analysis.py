@@ -5,6 +5,7 @@ import nltk
 # a high-level library built on top of NLTK which utilizes the data from movie reviews to categorize
 # whether text i considered 'positive' or 'negative'
 from textblob import TextBlob
+from textblob.sentiments import NaiveBayesAnalyzer
 from nltk.corpus import stopwords
 from string import punctuation
 from pprint import pprint
@@ -17,6 +18,10 @@ def clean_string(tweet):
 def sentiment_analysis_helper(text):
     analysis = TextBlob(clean_string(text))
     return analysis.sentiment.polarity
+
+def sa_everything(text):
+    analysis = TextBlob(clean_string(text), analyzer=NaiveBayesAnalyzer())
+    return analysis.sentiment
 
 def tokenize_title(test_title):
     stop_words = set(stopwords.words('english'))

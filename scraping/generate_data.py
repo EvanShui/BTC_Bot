@@ -5,9 +5,9 @@ import sys
 import os
 import time
 
-from .reddit import scrape_reddit
-from .article_scraper import scrape_article
-from .sentiment_analysis import sentiment_analysis
+from reddit import scrape_reddit
+from article_scraper import scrape_article
+from sentiment_analysis import sentiment_analysis
 
 sys.path.insert(0, '../../data_301_project/')
 
