@@ -4,31 +4,62 @@ import json
 import sys
 import os
 import time
+import pickle
 
-from reddit import scrape_reddit
-from article_scraper import scrape_article
-from sentiment_analysis import sentiment_analysis
+from scraping.reddit import push_shift
+from scraping.reddit import scrape_reddit_post
+from scraping.article_scraper import scrape_article
+from scraping.sentiment_analysis import sentiment_analysis
 
-sys.path.insert(0, '../../data_301_project/')
+sys.path.insert(0, '../../BTC_Bot/')
 
-def generate_reddit_json(time, total_days, days_apart, num_entries):
-    # generating data in increments of 100 days
-    lst = []
-    print('gathering data...')
-    for i in range(0, total_days, days_apart):
-        lst += scrape_reddit(i, i+days_apart, num_entries)
-    print("length of reddit list: ", len(lst))
-    id_num = 1
+def read_objs(file_name):
+    with open(file_name, 'rb') as f:
+       lst = pickle.load(f) 
     for i in lst:
-        i['id'] = id_num
-        id_num += 1
+        print(i.title)
+
+def generate_reddit_ids_json(time):
+    id_lst = []
+    counter = 0
+    start = datetime.now()
+    # the date BTC was released to the public
+    end = datetime(2010, 10, 1)
+    num_days = (start-end).days - 900
+    print("gathering reddit ids")
+    while num_days > 0 and counter < 800:
+        if num_days < 50:
+            start_ind = 50 - num_days
+        else:
+            start_ind = num_days - 50
+        id_lst += push_shift(start_ind, num_days) 
+        print("scraped {} reddit posts after: {} before: {}".format(counter, num_days, start_ind))
+        counter += 50
+        num_days -= 50
+        print("printing reddit object titles")
+    print(id_lst)
+    file_name = './data/reddit/{}_reddit_ids.json'.format(time)    
+    with open(file_name, 'w+') as f:
+        json.dump(id_lst, f)
+    print("done writing file")
+    return file_name
+
+
+def generate_reddit_json(id_file):
+    # have to read in the id file
+    id_lst = []
+    redObj_lst = []
+    with open(id_file, 'r') as f:
+        id_lst = json.load(f)
+    for id_num in id_lst:
+        redObj_lst.append(scrape_reddit_post(id_num))
     print('appended id\'s')
     print('data gathered')
     print("writing file...")
     print("generate reddit data cwd: ", os.getcwd())
-    file_name = './data/{}_reddit.json'.format(time)    
-    with open(file_name, 'w+') as f:
-        json.dump(lst, f)
+    file_name = './data/reddit/{}_reddit_objs.dat'.format(time)    
+    with open(file_name, 'wb+') as f:
+        pickle.dump(redObj_lst, f)
     print("done writing file")
     return file_name
 
@@ -90,11 +121,16 @@ def generate_data(total_days, days_apart, num_entries):
     (look at /data/recent_files.json for exact file names)
     """
 
+    getIds = 1
     TEST_REDDIT = 1
     TEST_ARTICLES = 1
     TEST_SA = 1
     current_time = datetime.utcnow().strftime("%Y-%m-%d_%H:%M:%S")
     file_json = {}
+    if getIds:
+        red_ids = generate_reddit_ids(current_time)
+    if getObjs:
+        retObjs = getenerate_reddit_json(red_ids)
     if TEST_REDDIT:
         reddit_file = './data/reddit_data.json'
     else:
